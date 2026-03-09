@@ -33,11 +33,11 @@ export const DIREK_DERINLIK_ESLEME: Record<number, number> = {
 
 // Ruzgar hizi bolgeleri
 export const RUZGAR_BOLGELERI: RuzgarBolgesi[] = [
-  { id: "hafif",    label: "Hafif Ruzgar",     hiz: 50 },
-  { id: "orta",     label: "Orta Ruzgar",       hiz: 80 },
-  { id: "kuvvetli", label: "Kuvvetli Ruzgar",   hiz: 110 },
-  { id: "firtina",  label: "Firtina",           hiz: 130 },
-  { id: "siddetli", label: "Siddetli Firtina",  hiz: 150 },
+  { id: "hafif",    label: "Hafif Rüzgar",      hiz: 50 },
+  { id: "orta",     label: "Orta Rüzgar",       hiz: 80 },
+  { id: "kuvvetli", label: "Kuvvetli Rüzgar",   hiz: 110 },
+  { id: "firtina",  label: "Fırtına",           hiz: 130 },
+  { id: "siddetli", label: "Şiddetli Fırtına",  hiz: 150 },
 ];
 
 // Zemin tipleri ve muhendislik parametreleri
@@ -52,16 +52,16 @@ export const ZEMIN_TIPLERI: ZeminTipi[] = [
   },
   {
     id: "siki_kum",
-    label: "Siki Kum",
-    aciklama: "Yogun, sikistirilmis kum",
+    label: "Sıkı Kum",
+    aciklama: "Yoğun, sıkıştırılmış kum",
     tasimagucu: 300,
     pasifBasincKatsayisi: 4.0,
     yogunluk: 1900,
   },
   {
     id: "gevsek_kum",
-    label: "Gevsek Kum",
-    aciklama: "Gevsek kumlu zemin",
+    label: "Gevşek Kum",
+    aciklama: "Gevşek kumlu zemin",
     tasimagucu: 150,
     pasifBasincKatsayisi: 2.5,
     yogunluk: 1600,
@@ -76,8 +76,8 @@ export const ZEMIN_TIPLERI: ZeminTipi[] = [
   },
   {
     id: "yumusak",
-    label: "Yumusak Zemin",
-    aciklama: "Yumusak, dolgulu zemin",
+    label: "Yumuşak Zemin",
+    aciklama: "Yumuşak, dolgulu zemin",
     tasimagucu: 75,
     pasifBasincKatsayisi: 1.5,
     yogunluk: 1400,

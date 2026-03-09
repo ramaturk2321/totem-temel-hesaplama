@@ -53,7 +53,7 @@ export default function TotemDiagram({ config, sonuc }: Props) {
   return (
     <div className="bg-gray-900/60 rounded-lg p-4 border border-gray-800">
       <h3 className="text-sm font-bold text-orange-400 uppercase mb-2">
-        Totem Sematik Gorunum
+        Totem Şematik Görünüm
       </h3>
       <svg
         viewBox={`0 0 ${VW} ${VH}`}
@@ -241,7 +241,7 @@ export default function TotemDiagram({ config, sonuc }: Props) {
             fill="#60A5FA"
             fontSize={9}
           >
-            Ruzgar
+            Rüzgar
           </text>
         </g>
 

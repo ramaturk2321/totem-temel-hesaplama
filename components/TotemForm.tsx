@@ -65,7 +65,7 @@ export default function TotemForm({ config, onChange }: Props) {
         </div>
         <div className="flex gap-2">
           <div className="flex-1">
-            <label className="text-xs text-gray-400">Genislik (m)</label>
+            <label className="text-xs text-gray-400">Genişlik (m)</label>
             <input
               type="number"
               min={0.5}
@@ -79,7 +79,7 @@ export default function TotemForm({ config, onChange }: Props) {
             />
           </div>
           <div className="flex-1">
-            <label className="text-xs text-gray-400">Yukseklik (m)</label>
+            <label className="text-xs text-gray-400">Yükseklik (m)</label>
             <input
               type="number"
               min={0.5}
@@ -114,7 +114,7 @@ export default function TotemForm({ config, onChange }: Props) {
           ))}
         </div>
         <div>
-          <label className="text-xs text-gray-400">Ozel Deger (m)</label>
+          <label className="text-xs text-gray-400">Özel Değer (m)</label>
           <input
             type="number"
             min={1}
@@ -132,7 +132,7 @@ export default function TotemForm({ config, onChange }: Props) {
       {/* BORU CAPI */}
       <div>
         <h3 className="text-sm font-bold text-orange-400 uppercase mb-2">
-          Boru Capi
+          Boru Çapı
         </h3>
         <div className="grid grid-cols-2 gap-2">
           {BORU_SECENEKLERI.map((b) => (
@@ -152,7 +152,7 @@ export default function TotemForm({ config, onChange }: Props) {
       {/* RUZGAR HIZI */}
       <div>
         <h3 className="text-sm font-bold text-orange-400 uppercase mb-2">
-          Ruzgar Hizi
+          Rüzgar Hızı
         </h3>
         <div className="grid grid-cols-2 gap-2 mb-3">
           {RUZGAR_BOLGELERI.map((r) => (
@@ -169,7 +169,7 @@ export default function TotemForm({ config, onChange }: Props) {
         </div>
         <div>
           <label className="text-xs text-gray-400">
-            Ozel Deger (km/h)
+            Özel Değer (km/h)
           </label>
           <input
             type="number"

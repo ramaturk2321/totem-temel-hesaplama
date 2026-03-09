@@ -4,7 +4,7 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: "Totem Tabela Temel Hesaplama - Eymen Reklam",
   description:
-    "Totem/pylon tabela beton temel boyutu ve hacim hesaplama araci. Ruzgar direnci hesabi ile guvenli temel olculeri.",
+    "Totem/pylon tabela beton temel boyutu ve hacim hesaplama aracı. Rüzgar direnci hesabı ile güvenli temel ölçüleri.",
 };
 
 export default function RootLayout({

@@ -146,13 +146,13 @@ export function temelBoyutlariHesapla(config: TotemConfig): TemelSonuc {
   // Donati onerisi
   let demirDonati: string;
   if (betonHacmi > 2.0) {
-    demirDonati = "Ø16 hasir donati, 15×15 cm aralikli, cift kat";
+    demirDonati = "Ø16 hasır donatı, 15×15 cm aralıklı, çift kat";
   } else if (betonHacmi > 1.0) {
-    demirDonati = "Ø14 hasir donati, 15×15 cm aralikli";
+    demirDonati = "Ø14 hasır donatı, 15×15 cm aralıklı";
   } else if (betonHacmi > 0.5) {
-    demirDonati = "Ø12 hasir donati, 20×20 cm aralikli";
+    demirDonati = "Ø12 hasır donatı, 20×20 cm aralıklı";
   } else {
-    demirDonati = "Ø10 hasir donati, 20×20 cm aralikli";
+    demirDonati = "Ø10 hasır donatı, 20×20 cm aralıklı";
   }
 
   return {

@@ -18,13 +18,13 @@ export default function ResultPanel({ sonuc }: Props) {
   return (
     <div className="bg-gray-900/60 rounded-lg p-4 border border-gray-800">
       <h3 className="text-sm font-bold text-orange-400 uppercase mb-4">
-        Hesaplama Sonuclari
+        Hesaplama Sonuçları
       </h3>
 
       <div className="space-y-3">
-        {/* Ruzgar Kuvveti */}
+        {/* Rüzgar Kuvveti */}
         <div className="bg-gray-800/50 rounded-lg p-3 border border-gray-700">
-          <div className="text-xs text-gray-400 mb-1">Ruzgar Kuvveti</div>
+          <div className="text-xs text-gray-400 mb-1">Rüzgar Kuvveti</div>
           <div className="grid grid-cols-3 gap-2 text-sm">
             <div>
               <span className="text-gray-500 text-xs">Panel</span>
@@ -49,9 +49,9 @@ export default function ResultPanel({ sonuc }: Props) {
           <div className="text-lg font-bold">{formatKNm(sonuc.devrilmeMomenti)}</div>
         </div>
 
-        {/* Temel Boyutlari */}
+        {/* Temel Boyutları */}
         <div className="bg-gray-800/50 rounded-lg p-3 border border-gray-700">
-          <div className="text-xs text-gray-400 mb-1">Temel Boyutlari</div>
+          <div className="text-xs text-gray-400 mb-1">Temel Boyutları</div>
           <div className="text-lg font-bold text-orange-400">
             {formatCm(sonuc.temelGenislik)} × {formatCm(sonuc.temelUzunluk)} ×{" "}
             {formatCm(sonuc.temelDerinlik)}
@@ -71,22 +71,22 @@ export default function ResultPanel({ sonuc }: Props) {
 
         {/* Demir Donati */}
         <div className="bg-gray-800/50 rounded-lg p-3 border border-gray-700">
-          <div className="text-xs text-gray-400 mb-1">Demir Donati Onerisi</div>
+          <div className="text-xs text-gray-400 mb-1">Demir Donatı Önerisi</div>
           <div className="text-sm font-semibold">{sonuc.demirDonati}</div>
         </div>
 
-        {/* Guvenlik Katsayisi */}
+        {/* Güvenlik Katsayısı */}
         <div className="bg-gray-800/50 rounded-lg p-3 border border-gray-700">
-          <div className="text-xs text-gray-400 mb-1">Guvenlik Katsayisi</div>
+          <div className="text-xs text-gray-400 mb-1">Güvenlik Katsayısı</div>
           <div className={`text-lg font-bold ${guvenlikRenk}`}>
             {formatSayi(sonuc.guvenlikKatsayisi, 2)}x
           </div>
           <div className="text-xs text-gray-500 mt-1">
             {sonuc.guvenlikKatsayisi >= 1.5
-              ? "Guvenli"
+              ? "Güvenli"
               : sonuc.guvenlikKatsayisi >= 1.2
-              ? "Sinirda - muhendis onayi alinmali"
-              : "Yetersiz - temel boyutlari arttirilmali"}
+              ? "Sınırda - mühendis onayı alınmalı"
+              : "Yetersiz - temel boyutları arttırılmalı"}
           </div>
         </div>
       </div>
