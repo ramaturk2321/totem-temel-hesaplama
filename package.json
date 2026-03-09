@@ -1,0 +1,25 @@
+{
+  "name": "totem-temel-hesaplama",
+  "version": "1.0.0",
+  "description": "Totem tabela temel (beton) hesaplama araci - Eymen Reklam",
+  "type": "module",
+  "scripts": {
+    "dev": "next dev -p 3457",
+    "build": "next build",
+    "start": "next start -p 3457"
+  },
+  "dependencies": {
+    "@tailwindcss/postcss": "^4.2.1",
+    "next": "^16.1.6",
+    "postcss": "^8.5.8",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4",
+    "tailwindcss": "^4.2.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "@types/react": "^19.2.0",
+    "@types/react-dom": "^19.2.0",
+    "typescript": "^5.9.3"
+  }
+}
