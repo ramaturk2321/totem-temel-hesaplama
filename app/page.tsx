@@ -50,7 +50,7 @@ export default function Home() {
         <div className="w-9 h-9 bg-orange-600 rounded-lg flex items-center justify-center font-bold text-sm">
           E
         </div>
-        <div>
+        <div className="flex-1">
           <h1 className="text-lg font-bold leading-tight">
             Totem Tabela Temel Hesaplama
           </h1>
@@ -58,6 +58,11 @@ export default function Home() {
             Eymen Reklam - Tabela Imalati & UV Baski
           </p>
         </div>
+        {!isIframe && (
+          <a href="/yonlendirme/" className="text-xs text-gray-400 hover:text-orange-300">
+            Yönlendirme tabelası hesabı →
+          </a>
+        )}
       </header>
 
       {/* MAIN */}

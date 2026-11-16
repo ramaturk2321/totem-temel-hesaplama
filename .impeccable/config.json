@@ -1,0 +1,14 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "overused-font",
+        "value": "helvetica",
+        "createdAt": "2026-11-16T13:25:28.787Z",
+        "reason": "Claude karari: A4 basili muhendislik raporu, cevrimdisi PDF uretiminde sistem fontu sart; web arayuzu degil"
+      }
+    ]
+  }
+}
