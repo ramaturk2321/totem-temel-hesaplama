@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useMemo, useEffect } from "react";
+import Link from "next/link";
 import type { TotemConfig } from "@/lib/types";
 import { DEFAULT_CONFIG } from "@/lib/types";
 import { temelBoyutlariHesapla } from "@/lib/calculations";
@@ -59,9 +60,9 @@ export default function Home() {
           </p>
         </div>
         {!isIframe && (
-          <a href="/yonlendirme/" className="text-xs text-gray-400 hover:text-orange-300">
+          <Link href="/yonlendirme/" className="text-xs text-gray-400 hover:text-orange-300">
             Yönlendirme tabelası hesabı →
-          </a>
+          </Link>
         )}
       </header>
 

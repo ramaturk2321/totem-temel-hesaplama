@@ -16,7 +16,7 @@ import { formatKN, formatKNm, formatSayi } from "@/lib/formatters";
 import Disclaimer from "@/components/Disclaimer";
 
 type SayiAlani = {
-  [K in keyof YonGirdi]: YonGirdi[K] extends number ? K : never;
+  [K in keyof YonGirdi]-?: YonGirdi[K] extends number ? K : never;
 }[keyof YonGirdi];
 
 const ALANLAR: { baslik: string; alanlar: [SayiAlani, string, number][] }[] = [

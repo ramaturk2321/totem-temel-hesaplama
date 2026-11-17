@@ -49,10 +49,15 @@ function sema(g: YonGirdi, s: YonSonuc): string {
   const y0 = 12;
   const zeminY = y0 + H;
   const xs = [x0, x0 + b + W];
-  let o = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${x0 * 2 + W + 2 * b + 30} ${H + td + 20}" class="sema">`;
+  const saha = g.montaj === "sahaBetonu";
+  const altPay = saha ? (g.betonKalinlik ?? 200) / 10 + 6 : td + 20;
+  let o = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${x0 * 2 + W + 2 * b + 30} ${H + altPay + 12}" class="sema">`;
+  if (saha)
+    o += `<rect x="0" y="${zeminY}" width="${x0 * 2 + W + 2 * b + 30}" height="${(g.betonKalinlik ?? 200) / 10}" fill="#dcdfe3" stroke="#8a9098" stroke-width="0.4"/>`;
   o += `<line x1="0" y1="${zeminY}" x2="${x0 * 2 + W + 2 * b + 30}" y2="${zeminY}" stroke="#555" stroke-width="0.8"/>`;
   for (const x of xs) {
-    o += `<rect x="${x + b / 2 - tb / 2}" y="${zeminY}" width="${tb}" height="${td}" fill="#e6e8eb" stroke="#8a9098" stroke-width="0.5" stroke-dasharray="3 2"/>`;
+    if (g.montaj !== "sahaBetonu")
+      o += `<rect x="${x + b / 2 - tb / 2}" y="${zeminY}" width="${tb}" height="${td}" fill="#e6e8eb" stroke="#8a9098" stroke-width="0.5" stroke-dasharray="3 2"/>`;
     o += `<rect x="${x}" y="${y0}" width="${b}" height="${H}" fill="#383e42"/>`;
     o += `<rect x="${x + b / 2 - g.flansKenar / 20}" y="${zeminY - 1.5}" width="${g.flansKenar / 10}" height="1.5" fill="#111"/>`;
   }
@@ -223,5 +228,134 @@ ${ozetSatir}
 <header class="ust"><div class="firma">EYMEN <span>REKLAM</span></div><div class="sag">${esc(b.referans)}<br>${esc(b.tarih)}</div></header>
 ${kapak}
 ${b.durumlar.map((d, i) => durumBolumu(d, i + 1)).join("\n")}
+</body></html>`;
+}
+
+// ── Tek sayfalık müşteri özeti ────────────────────────────────────────────────
+export interface OzetBilgi extends RaporBilgi {
+  ruzgarNotu?: string; // hesap hızının yanına yazılacak kaynaklı açıklama
+  notlar?: string[];
+}
+
+export function ozetHTML(b: OzetBilgi): string {
+  const d = b.durumlar.map((x) => ({ ...x, s: yonlendirmeHesapla(x.girdi) }));
+  const g0 = d[0].girdi;
+  const s0 = d[0].s;
+  const saha = g0.montaj === "sahaBetonu";
+  const kg = (n: number) => f(n / 9.81, 0);
+  const yuzde = (o: number) => `%${f(o * 100, 0)}`;
+  const kontrolAdlari = s0.kontroller.map((c) => c.ad).filter((ad) => !ad.startsWith("Saha"));
+  const sade: Record<string, string> = {
+    "Direk eğilme dayanımı": "Direğin eğilmeye dayanımı",
+    "Tepe sehimi (karakteristik yük)": "Tabela tepesinin esnemesi",
+    "Flanş plakası eğilmesi": "Flanş plakasının dayanımı",
+    "Temel devrilme güvenliği": "Temelin devrilmeye karşı güvenliği",
+    "Temel kayma güvenliği": "Temelin kaymaya karşı güvenliği",
+    "Zemin gerilmesi": "Zemine gelen basınç",
+  };
+  // Sade satırlar: [etiket, yük, dayanım, birim, ondalık]
+  const sadeSatirlar = (s: YonSonuc, g: YonGirdi): [string, number, number, string, number][] => [
+    ["Direğin eğilmeye dayanımı", s.mEd / 1000, s.mRd / 1000, "kN·m", 2],
+    ["Tabela tepesinin esnemesi", s.sehim, s.sehimSinir, "mm", 0],
+    ["Dübel cıvatasının çekmeye dayanımı", s.ankrajCekme / 1000, s.ftRd / 1000, "kN", 1],
+    ["Flanş plakasının dayanımı", s.flansGerilme, g.celikFy, "MPa", 0],
+    ["Dübelin betondan kopmaya dayanımı", s.dubelTalep / 1000, s.dubelKoniRd / 1000, "kN", 1],
+  ];
+  const kontrolSatir = saha
+    ? sadeSatirlar(s0, g0)
+        .map(([etiket], i) => {
+          const hucre = d
+            .map(({ s, girdi }) => {
+              const [, yuk, dayanim, birim, ond] = sadeSatirlar(s, girdi)[i];
+              const uygun = yuk <= dayanim;
+              return `<td>${f(yuk, ond)} / ${f(dayanim, ond)} ${birim}</td><td class="${uygun ? "ok" : "no"}">${yuzde(yuk / dayanim)} · ${uygun ? "Uygun" : "Yetersiz"}</td>`;
+            })
+            .join("");
+          return `<tr><td>${esc(etiket)}</td>${hucre}</tr>`;
+        })
+        .join("\n")
+    : kontrolAdlari
+        .map((ad) => {
+          const hucre = d
+            .map(({ s }) => {
+              const c = s.kontroller.find((k) => k.ad === ad)!;
+              return `<td>${esc(c.hesap)}<br><span class="gri">sınır: ${esc(c.sinir)}</span></td><td class="${c.uygun ? "ok" : "no"}">${yuzde(c.oran)} · ${c.uygun ? "Uygun" : "Yetersiz"}</td>`;
+            })
+            .join("");
+          return `<tr><td>${esc(sade[ad] ?? ad)}</td>${hucre}</tr>`;
+        })
+        .join("\n");
+  const hepsiUygun = d.every(({ s }) => s.uygun);
+  const ayniOlcu = d.every(
+    ({ girdi: g }) => profilAd(g) === profilAd(g0) && flansAd(g) === flansAd(g0) && g.ankrajCap === g0.ankrajCap
+  );
+  const olcuSatir = (g: YonGirdi) =>
+    `<tr><td>Direk</td><td>2 adet kutu profil <b>${profilAd(g)}</b>, S235 çelik</td></tr>
+<tr><td>Flanş</td><td><b>${flansAd(g)}</b> çelik plaka, direğe kaynaklı</td></tr>
+<tr><td>Bağlantı</td><td>${
+      saha
+        ? `Her flanşta <b>4 × M${g.ankrajCap} kimyasal dübel</b>, betona gömme derinliği <b>${f(g.dubelGomme ?? 125, 0)} mm</b>`
+        : `Her flanşta 4 × M${g.ankrajCap} ankraj; temel ${temelAd(g)} C25/30`
+    }</td></tr>${
+      saha
+        ? `\n<tr><td>Saha betonu</td><td>En az <b>${f(Math.ceil(yonlendirmeHesapla(g).gerekliBetonKalinlik / 10), 0)} cm</b> kalınlıkta, C${f(g.betonFck ?? 25, 0)} sınıfı</td></tr>`
+        : ""
+    }`;
+  const css = `
+@page { size: A4; margin: 11mm 14mm 9mm; }
+* { box-sizing: border-box; }
+body { font-family: "Helvetica Neue", Arial, sans-serif; font-size: 9.2pt; color: #1a1d21; margin: 0; line-height: 1.33; }
+header { display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 1.2pt solid #e65c00; padding-bottom: 2mm; margin-bottom: 4mm; }
+.firma { font-weight: 700; font-size: 14pt; letter-spacing: .5pt; } .firma span { color: #e65c00; }
+.sag { text-align: right; font-size: 8.5pt; color: #555; }
+h1 { font-size: 15pt; margin: 0 0 1mm; } .alt { color: #555; margin: 0 0 3mm; }
+h2 { font-size: 10.5pt; color: #003362; margin: 3.2mm 0 1.2mm; }
+table { border-collapse: collapse; width: 100%; } td, th { padding: .9mm 1.8mm; border-bottom: .3pt solid #d5d9de; text-align: left; vertical-align: top; }
+th { font-size: 8.5pt; color: #555; border-bottom: .8pt solid #888; font-weight: 600; }
+.kv td:first-child { color: #555; width: 34%; }
+.gri { color: #6b7280; font-size: 8.5pt; }
+td.ok { color: #1a7f37; font-weight: 700; white-space: nowrap; } td.no { color: #c62828; font-weight: 700; white-space: nowrap; }
+.ust { display: grid; grid-template-columns: 1fr 34mm; gap: 6mm; align-items: start; }
+.sema { width: 100%; height: auto; max-height: 46mm; }
+figure { margin: 0; text-align: center; font-size: 7.5pt; color: #555; }
+.sonuc { background: #f1f5f9; border-left: 2pt solid #003362; padding: 2.5mm 3mm; margin-top: 3mm; }
+.sonuc table td { border-bottom: none; padding: .6mm 1.8mm .6mm 0; } .sonuc td:first-child { color: #555; width: 22%; }
+ul { margin: 1mm 0 0; padding-left: 5mm; } li { margin-bottom: .8mm; }
+.imza { margin-top: 3mm; font-size: 8.5pt; color: #555; }
+`;
+  const basliklar = d
+    .map(({ girdi: g, adet }) => `<th colspan="2">${esc(g.ad)} (${adet} adet)</th>`)
+    .join("");
+  return `<!doctype html><html lang="tr"><head><meta charset="utf-8"><title>Rüzgâr Dayanımı Hesap Özeti — ${esc(b.musteri)}</title><style>${css}</style></head><body>
+<header><div class="firma">EYMEN <span>REKLAM</span></div><div class="sag">${esc(b.referans)}<br>${esc(b.tarih)}</div></header>
+<h1>Yönlendirme Tabelaları — Rüzgâr Dayanımı Hesap Özeti</h1>
+<p class="alt">${esc(b.musteri)} · ${esc(b.proje)}</p>
+<div class="ust"><div>
+<h2 style="margin-top:0">1. Hesabın konusu</h2>
+<p style="margin:0">Çift direkli yönlendirme tabelalarının ${f(g0.ruzgarHizi, 0)} km/sa rüzgârda ayakta kalıp kalmadığı hesaplanmıştır. ${saha ? "Tabelalar mevcut saha betonuna flanş ve kimyasal dübelle bağlanır; ayrıca temel dökülmez." : "Her direk ayrı beton temele ankrajla bağlanır."}</p>
+<h2>2. Kabuller</h2>
+<table class="kv">
+<tr><td>Hesap rüzgâr hızı</td><td><b>${f(g0.ruzgarHizi, 0)} km/sa</b> (${f(s0.hiz, 1)} m/sn)${b.ruzgarNotu ? `<br><span class="gri">${esc(b.ruzgarNotu)}</span>` : ""}</td></tr>
+<tr><td>Rüzgâr basıncı</td><td>${f(s0.q, 0)} N/m² (m² başına yaklaşık ${kg(s0.q)} kg)</td></tr>
+<tr><td>Tabela kuvvet katsayısı</td><td>${f(g0.cfPanel, 1)}; kuvvet tabela genişliğinin ¼'ü kadar kaçık uygulanmış, en çok yüklenen direk hesaplanmıştır</td></tr>
+<tr><td>Güvenlik payı</td><td>Rüzgâr yükü ${f(GAMMA_Q, 1)} ile çarpılarak hesaplanmıştır</td></tr>
+<tr><td>Standartlar</td><td>TS EN 1991-1-4 (rüzgâr), TS EN 1993-1-1 ve 1-8 (çelik, cıvata)${saha ? ", TS EN 1992-4 (dübel)" : ""}</td></tr>
+</table>
+</div><figure>${sema(g0, s0)}<figcaption>${esc(g0.ad)}</figcaption></figure></div>
+<h2>3. Hesap sonuçları</h2>
+<table><thead><tr><th></th>${basliklar}</tr></thead><tbody>
+<tr><td>Tabela ölçüsü (genişlik × yükseklik)</td>${d.map(({ s }) => `<td colspan="2">${cm(s.toplamGenislik)} × ${cm(s.toplamYukseklik)} cm</td>`).join("")}</tr>
+<tr><td>Tabelaya gelen rüzgâr kuvveti</td>${d.map(({ s }) => `<td colspan="2">${f(s.fToplam / 1000)} kN (yaklaşık ${kg(s.fToplam)} kg)</td>`).join("")}</tr>
+<tr><th>Kontrol</th>${d.map(() => `<th>Gelen yük / dayanım</th><th>Kapasite kullanımı</th>`).join("")}</tr>
+${kontrolSatir}
+</tbody></table>
+<p class="gri" style="margin:1.5mm 0 0">Kapasite kullanımı %100'ün altındaysa eleman o yükü güvenlik payıyla birlikte taşıyor demektir.</p>
+<h2>4. Sonuç ve uygulanacak ölçüler</h2>
+<div class="sonuc">
+<p style="margin:0 0 1.5mm"><b>${hepsiUygun ? `Tabelalar ${f(g0.ruzgarHizi, 0)} km/sa rüzgâra aşağıdaki ölçülerle dayanıyor.` : "Aşağıdaki ölçüler bazı kontrollerde yetersiz kalıyor."}</b>${ayniOlcu && d.length > 1 ? " Ölçüler iki tabela tipi için aynıdır." : ""}</p>
+<table>${ayniOlcu ? olcuSatir(g0) : d.map(({ girdi: g }) => `<tr><td colspan="2"><b>${esc(g.ad)}</b></td></tr>${olcuSatir(g)}`).join("")}</table>
+</div>
+${b.notlar?.length ? `<h2>5. Notlar</h2><ul>${b.notlar.map((n) => `<li>${esc(n)}</li>`).join("")}</ul>` : ""}
+<p class="imza">Hazırlayan: Eymen Reklam — Pendik / İstanbul</p>
 </body></html>`;
 }

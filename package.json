@@ -8,7 +8,8 @@
     "build": "next build",
     "start": "next start -p 3457",
     "test": "node --test lib/yonlendirme.test.ts",
-    "rapor": "node scripts/rapor-pdf.mjs"
+    "rapor": "node scripts/rapor-pdf.mjs",
+    "site": "next build && rsync -a --delete out/ ../eymenreklam-site/public/statik-hesap/"
   },
   "dependencies": {
     "@tailwindcss/postcss": "^4.2.1",

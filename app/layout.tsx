@@ -14,12 +14,6 @@ export default function RootLayout({
 }) {
   return (
     <html lang="tr">
-      <head>
-        <link
-          href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap"
-          rel="stylesheet"
-        />
-      </head>
       <body className="bg-gray-950 text-white min-h-screen">{children}</body>
     </html>
   );

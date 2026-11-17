@@ -12,6 +12,8 @@ export const GAMMA_M2 = 1.25; // cıvata malzeme katsayısı
 export const E_CELIK = 210000; // MPa
 export const GK_MIN = 1.5; // devrilme ve kayma için en az güvenlik katsayısı
 export const SURTUNME = 0.5; // beton–zemin sürtünme katsayısı
+export const K_KONI = 7.7; // sonradan takılan dübel, çatlamış beton (TS EN 1992-4)
+export const GAMMA_MC = 1.5; // beton koni kopması malzeme katsayısı
 const CELIK_YOGUNLUK = 7850; // kg/m³
 const PANEL_BIRIM_AGIRLIK = 8; // kg/m² (3 mm kompozit + arka kuşak + bağlantı)
 
@@ -45,6 +47,11 @@ export interface YonGirdi {
   temelL: number; // m
   temelD: number; // m
   zeminTipiId: string;
+  // Mevcut saha betonuna kimyasal dübelle montaj (verilmezse ayrı beton temel hesaplanır)
+  montaj?: "temel" | "sahaBetonu";
+  betonKalinlik?: number; // mm, saha betonu kalınlığı
+  dubelGomme?: number; // mm, etkili gömme derinliği h_ef
+  betonFck?: number; // MPa
 }
 
 export interface Kontrol {
@@ -97,6 +104,9 @@ export interface YonSonuc {
   zeminGerilme: number; // kPa
   zemin: ZeminTipi;
   betonHacmi: number; // m³, iki blok
+  dubelTalep: number; // N, çekmedeki dübel çiftine gelen kuvvet (saha betonu montajı)
+  dubelKoniRd: number; // N, dübel çiftinin beton koni dayanımı
+  gerekliBetonKalinlik: number; // mm
   kontroller: Kontrol[];
   uygun: boolean;
 }
@@ -230,6 +240,17 @@ export function yonlendirmeHesapla(g: YonGirdi): YonSonuc {
     Number.isFinite(n)
       ? new Intl.NumberFormat("tr-TR", { maximumFractionDigits: d }).format(n)
       : "∞";
+  // 6) Saha betonuna kimyasal dübel: beton koni kopması (TS EN 1992-4, çatlamış beton, k = 7,7)
+  const sahaBetonu = g.montaj === "sahaBetonu";
+  const hef = g.dubelGomme ?? 125;
+  const fck = g.betonFck ?? 25;
+  const tekKoni = K_KONI * Math.sqrt(fck) * hef ** 1.5; // N, tek dübel karakteristik
+  const grupOrani = (3 * hef + Math.min(civataAraligi, 3 * hef)) / (3 * hef); // yan yana iki dübel
+  const dubelKoniRd = (tekKoni * grupOrani) / GAMMA_MC;
+  const dubelTalep = 2 * ankrajCekme;
+  const gerekliBetonKalinlik = Math.max(hef + 2 * (g.ankrajCap + 2), 100);
+  const betonKalinlik = g.betonKalinlik ?? 0;
+
   const kontroller: Kontrol[] = [
     {
       ad: "Direk eğilme dayanımı",
@@ -266,27 +287,46 @@ export function yonlendirmeHesapla(g: YonGirdi): YonSonuc {
       oran: flansGerilme / g.celikFy,
       uygun: flansGerilme <= g.celikFy,
     },
-    {
-      ad: "Temel devrilme güvenliği",
-      hesap: `GK = ${s(gkDevrilme)}`,
-      sinir: `GK ≥ ${s(GK_MIN, 1)}`,
-      oran: GK_MIN / gkDevrilme,
-      uygun: gkDevrilme >= GK_MIN,
-    },
-    {
-      ad: "Temel kayma güvenliği",
-      hesap: `GK = ${s(gkKayma)}`,
-      sinir: `GK ≥ ${s(GK_MIN, 1)}`,
-      oran: GK_MIN / gkKayma,
-      uygun: gkKayma >= GK_MIN,
-    },
-    {
-      ad: "Zemin gerilmesi",
-      hesap: `σ_maks = ${s(zeminGerilme, 0)} kPa`,
-      sinir: `σ_em = ${s(zemin.tasimagucu, 0)} kPa`,
-      oran: zeminGerilme / zemin.tasimagucu,
-      uygun: zeminGerilme <= zemin.tasimagucu,
-    },
+    ...(sahaBetonu
+      ? [
+          {
+            ad: "Dübel beton koni dayanımı (çekmedeki çift)",
+            hesap: `N_Ed = ${s(dubelTalep / 1000)} kN`,
+            sinir: `N_Rd,c = ${s(dubelKoniRd / 1000)} kN (h_ef = ${s(hef, 0)} mm)`,
+            oran: dubelTalep / dubelKoniRd,
+            uygun: dubelTalep <= dubelKoniRd,
+          },
+          {
+            ad: "Saha betonu kalınlığı",
+            hesap: `h = ${s(betonKalinlik, 0)} mm`,
+            sinir: `h ≥ ${s(gerekliBetonKalinlik, 0)} mm`,
+            oran: gerekliBetonKalinlik / Math.max(betonKalinlik, 1),
+            uygun: betonKalinlik >= gerekliBetonKalinlik,
+          },
+        ]
+      : [
+          {
+            ad: "Temel devrilme güvenliği",
+            hesap: `GK = ${s(gkDevrilme)}`,
+            sinir: `GK ≥ ${s(GK_MIN, 1)}`,
+            oran: GK_MIN / gkDevrilme,
+            uygun: gkDevrilme >= GK_MIN,
+          },
+          {
+            ad: "Temel kayma güvenliği",
+            hesap: `GK = ${s(gkKayma)}`,
+            sinir: `GK ≥ ${s(GK_MIN, 1)}`,
+            oran: GK_MIN / gkKayma,
+            uygun: gkKayma >= GK_MIN,
+          },
+          {
+            ad: "Zemin gerilmesi",
+            hesap: `σ_maks = ${s(zeminGerilme, 0)} kPa`,
+            sinir: `σ_em = ${s(zemin.tasimagucu, 0)} kPa`,
+            oran: zeminGerilme / zemin.tasimagucu,
+            uygun: zeminGerilme <= zemin.tasimagucu,
+          },
+        ]),
   ];
 
   return {
@@ -296,7 +336,8 @@ export function yonlendirmeHesapla(g: YonGirdi): YonSonuc {
     wKullanilan, mRd, vRd, gerilme, sehim, sehimSinir,
     ankrajKol, ankrajCekme, ankrajKesme, ftRd, fvRd, flansGerilme, flansGerekliKalinlik,
     agirlik, temelAgirlik, mDevrilme, mDirenc, gkDevrilme, gkKayma, zeminGerilme, zemin,
-    betonHacmi: 2 * g.temelB * g.temelL * g.temelD,
+    betonHacmi: sahaBetonu ? 0 : 2 * g.temelB * g.temelL * g.temelD,
+    dubelTalep, dubelKoniRd, gerekliBetonKalinlik,
     kontroller,
     uygun: kontroller.every((c) => c.uygun),
   };
@@ -336,6 +377,16 @@ export function yonlendirmeOner(g: YonGirdi): YonGirdi {
   // Flanş kalınlığı
   const gerekli = yonlendirmeHesapla(o).flansGerekliKalinlik;
   if (gerekli > o.flansKalinlik) o.flansKalinlik = yukari(gerekli, 2);
+  // Saha betonu montajı: dübel aralığını açmak için flanşı büyüt (20 mm adım, en çok 400 mm)
+  if (o.montaj === "sahaBetonu") {
+    const dubelMi = (ad: string) => ad.startsWith("Dübel");
+    while (!gecti(o, dubelMi) && o.flansKenar < 400) {
+      o.flansKenar += 20;
+      const t = yonlendirmeHesapla(o).flansGerekliKalinlik;
+      if (t > o.flansKalinlik) o.flansKalinlik = yukari(t, 2);
+    }
+    return o;
+  }
   // Temel: önce derinlik (en çok 1,20 m), sonra kare taban
   const temelMi = (ad: string) => TEMEL_ADLARI.includes(ad);
   let tur = 400;

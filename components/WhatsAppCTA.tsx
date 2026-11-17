@@ -1,7 +1,7 @@
 "use client";
 
 export default function WhatsAppCTA() {
-  const phone = "905396137498"; // Eymen Reklam WhatsApp
+  const phone = "905455491162"; // Eymen Reklam WhatsApp
   const message = encodeURIComponent(
     "Merhaba, totem tabela temel hesaplama ile ilgili bilgi almak istiyorum."
   );

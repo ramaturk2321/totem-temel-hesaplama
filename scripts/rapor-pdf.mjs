@@ -1,14 +1,15 @@
 // Yönlendirme tabelası ön statik hesap raporunu PDF'e basar.
-// Kullanım: node scripts/rapor-pdf.mjs <is.json> <cikti.pdf>
+// Kullanım: node scripts/rapor-pdf.mjs <is.json> <cikti.pdf> [--ozet]
 // is.json: { musteri, proje, referans, tarih, durumlar: [{ adet, girdi: { ...VARSAYILAN_YON'dan farklı alanlar } }] }
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { execFileSync } from "node:child_process";
-import { raporHTML } from "../lib/rapor.ts";
+import { raporHTML, ozetHTML } from "../lib/rapor.ts";
 import { VARSAYILAN_YON } from "../lib/yonlendirme.ts";
 
-const [isDosyasi, cikti] = process.argv.slice(2);
+const ozet = process.argv.includes("--ozet"); // tek sayfalık müşteri özeti
+const [isDosyasi, cikti] = process.argv.slice(2).filter((a) => !a.startsWith("--"));
 if (!isDosyasi || !cikti) {
   console.error("Kullanım: node scripts/rapor-pdf.mjs <is.json> <cikti.pdf>");
   process.exit(1);
@@ -16,7 +17,7 @@ if (!isDosyasi || !cikti) {
 const is = JSON.parse(fs.readFileSync(isDosyasi, "utf8"));
 is.durumlar = is.durumlar.map((d) => ({ adet: d.adet, girdi: { ...VARSAYILAN_YON, ...d.girdi } }));
 
-const html = raporHTML(is);
+const html = ozet ? ozetHTML(is) : raporHTML(is);
 const gecici = path.join(fs.mkdtempSync(path.join(os.tmpdir(), "statik-rapor-")), "rapor.html");
 fs.writeFileSync(gecici, html);
 

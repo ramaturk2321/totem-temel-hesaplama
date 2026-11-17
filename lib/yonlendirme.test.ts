@@ -72,3 +72,26 @@ test("daha kısa tabela daha az moment üretir", () => {
   assert.ok(bes.mEd < on.mEd);
   yakin(bes.panelYukseklik, 1.05);
 });
+
+test("saha betonu montajı: 120 km/sa, 10 modül — elle hesapla tutuyor", () => {
+  const g = {
+    ...VARSAYILAN_YON, ruzgarHizi: 120, flansKalinlik: 12,
+    montaj: "sahaBetonu" as const, betonKalinlik: 200, dubelGomme: 125,
+  };
+  const s = yonlendirmeHesapla(g);
+  yakin(s.q, 0.5 * 1.25 * (120 / 3.6) ** 2); // 694,4 Pa
+  // tek dübel 7,7·√25·125^1,5 = 53,8 kN; çift ×(375+150)/375 = 1,4; /1,5 → 50,2 kN
+  yakin(s.dubelKoniRd, (7.7 * 5 * 125 ** 1.5 * 1.4) / 1.5);
+  yakin(s.dubelTalep, 2 * s.ankrajCekme);
+  assert.equal(s.gerekliBetonKalinlik, 161);
+  assert.equal(s.uygun, true, JSON.stringify(s.kontroller.filter((c) => !c.uygun)));
+  assert.ok(!s.kontroller.some((c) => c.ad.startsWith("Temel")));
+  assert.equal(s.betonHacmi, 0);
+});
+
+test("saha betonu ince ise kalınlık kontrolü yetersiz çıkar", () => {
+  const s = yonlendirmeHesapla({
+    ...VARSAYILAN_YON, ruzgarHizi: 120, montaj: "sahaBetonu", betonKalinlik: 120, dubelGomme: 125,
+  });
+  assert.equal(s.kontroller.find((c) => c.ad.startsWith("Saha"))!.uygun, false);
+});
