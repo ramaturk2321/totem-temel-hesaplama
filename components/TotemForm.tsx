@@ -37,9 +37,9 @@ export default function TotemForm({ config, onChange }: Props) {
     <div className="space-y-6">
       {/* PANEL BOYUTU */}
       <div>
-        <h3 className="text-sm font-bold text-orange-400 uppercase mb-2">
+        <h2 className="text-sm font-bold text-orange-400 uppercase mb-2">
           Panel Boyutu
-        </h3>
+        </h2>
         <div className="grid grid-cols-3 gap-2 mb-3">
           {PANEL_ONAYARLARI.map((p) => {
             const isSelected =
@@ -97,9 +97,9 @@ export default function TotemForm({ config, onChange }: Props) {
 
       {/* DIREK BOYU */}
       <div>
-        <h3 className="text-sm font-bold text-orange-400 uppercase mb-2">
+        <h2 className="text-sm font-bold text-orange-400 uppercase mb-2">
           Direk Boyu
-        </h3>
+        </h2>
         <div className="flex flex-wrap gap-2 mb-3">
           {DIREK_BOYLARI.map((boy) => (
             <button
@@ -131,9 +131,9 @@ export default function TotemForm({ config, onChange }: Props) {
 
       {/* BORU CAPI */}
       <div>
-        <h3 className="text-sm font-bold text-orange-400 uppercase mb-2">
+        <h2 className="text-sm font-bold text-orange-400 uppercase mb-2">
           Boru Çapı
-        </h3>
+        </h2>
         <div className="grid grid-cols-2 gap-2">
           {BORU_SECENEKLERI.map((b) => (
             <button
@@ -151,9 +151,9 @@ export default function TotemForm({ config, onChange }: Props) {
 
       {/* RUZGAR HIZI */}
       <div>
-        <h3 className="text-sm font-bold text-orange-400 uppercase mb-2">
+        <h2 className="text-sm font-bold text-orange-400 uppercase mb-2">
           Rüzgar Hızı
-        </h3>
+        </h2>
         <div className="grid grid-cols-2 gap-2 mb-3">
           {RUZGAR_BOLGELERI.map((r) => (
             <button
@@ -187,9 +187,9 @@ export default function TotemForm({ config, onChange }: Props) {
 
       {/* ZEMIN TIPI */}
       <div>
-        <h3 className="text-sm font-bold text-orange-400 uppercase mb-2">
+        <h2 className="text-sm font-bold text-orange-400 uppercase mb-2">
           Zemin Tipi
-        </h3>
+        </h2>
         <div className="grid grid-cols-2 gap-2">
           {ZEMIN_TIPLERI.map((z) => (
             <button

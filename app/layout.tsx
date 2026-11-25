@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
 import "./globals.css";
 
+// Sayfa başlığı/açıklaması/canonical her sayfanın kendi layout'unda (app/(totem), app/yonlendirme).
 export const metadata: Metadata = {
-  title: "Totem Tabela Temel Hesaplama - Eymen Reklam",
-  description:
-    "Totem/pylon tabela beton temel boyutu ve hacim hesaplama aracı. Rüzgar direnci hesabı ile güvenli temel ölçüleri.",
+  metadataBase: new URL("https://www.eymenreklam.com.tr"),
+  title: "Tabela Statik Hesap Araçları | Eymen Reklam",
 };
 
 export default function RootLayout({

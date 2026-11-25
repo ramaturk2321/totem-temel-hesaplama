@@ -135,9 +135,9 @@ export default function Yonlendirme() {
 
           {ALANLAR.map((grup) => (
             <div key={grup.baslik}>
-              <h3 className="text-sm font-bold text-orange-400 uppercase mb-2">
+              <h2 className="text-sm font-bold text-orange-400 uppercase mb-2">
                 {grup.baslik}
-              </h3>
+              </h2>
               <div className="grid grid-cols-2 gap-2">
                 {grup.alanlar.map(([alan, etiket, adim]) => (
                   <div key={alan}>
@@ -202,9 +202,9 @@ export default function Yonlendirme() {
           ))}
 
           <div>
-            <h3 className="text-sm font-bold text-orange-400 uppercase mb-2">
+            <h2 className="text-sm font-bold text-orange-400 uppercase mb-2">
               Direk profili
-            </h3>
+            </h2>
             <div className="grid grid-cols-2 gap-2">
               <div>
                 <label className="text-xs text-gray-400">Kutu profil</label>
@@ -241,7 +241,7 @@ export default function Yonlendirme() {
 
         <div className="flex flex-col gap-4">
           <div className="bg-gray-900/60 rounded-lg p-4 border border-gray-800">
-            <h3 className="text-sm font-bold text-orange-400 uppercase mb-3">Yükler</h3>
+            <h2 className="text-sm font-bold text-orange-400 uppercase mb-3">Yükler</h2>
             <div className="grid grid-cols-3 gap-2 text-sm">
               <div>
                 <div className="text-xs text-gray-500">Hız basıncı</div>
@@ -260,7 +260,7 @@ export default function Yonlendirme() {
 
           <div className="bg-gray-900/60 rounded-lg p-4 border border-gray-800">
             <div className="flex items-center justify-between mb-3">
-              <h3 className="text-sm font-bold text-orange-400 uppercase">Kontroller</h3>
+              <h2 className="text-sm font-bold text-orange-400 uppercase">Kontroller</h2>
               <span
                 className={`text-xs font-bold px-2 py-1 rounded ${
                   s.uygun ? "bg-green-500/15 text-green-400" : "bg-red-500/15 text-red-400"

@@ -17,9 +17,9 @@ export default function ResultPanel({ sonuc }: Props) {
 
   return (
     <div className="bg-gray-900/60 rounded-lg p-4 border border-gray-800">
-      <h3 className="text-sm font-bold text-orange-400 uppercase mb-4">
+      <h2 className="text-sm font-bold text-orange-400 uppercase mb-4">
         Hesaplama Sonuçları
-      </h3>
+      </h2>
 
       <div className="space-y-3">
         {/* Rüzgar Kuvveti */}
